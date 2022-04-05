@@ -1,6 +1,10 @@
 CFLAGS=-std=c11 -g -static
-ycc: ycc.c
-test:ycc
+SRCS=$(wildcard *.c)
+OBJS=$(SRCS:.c=.o)
+9cc: $(OBJS)
+	$(CC) -o ycc $(OBJS) $(LDFLAGS)
+$(OBJS): ycc.h
+test: ycc
 	./test.sh
 clean:
 	rm -f ycc *.o *~ tmp*
