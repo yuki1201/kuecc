@@ -45,6 +45,8 @@ typedef enum {
 	ND_NE,//!=
 	ND_LT,//<
 	ND_LE,//<=
+	ND_ASSIGN,//代入
+	ND_LVAR,//ローカル変数
 	ND_NUM, // 整数
 } NodeKind;
 
@@ -56,11 +58,14 @@ struct Node {
 	Node *lhs; // 左辺
 	Node *rhs; // 右辺
 	int val; // kindがND_NUMの場合のみ使う
+	int offset;
 };
 
+extern Node *code[100];
 Token *token;//global宣言
 
 Node *expr();
+void program();
 
 void codegen(Node *node);
 void gen(Node *node);
