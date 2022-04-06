@@ -12,6 +12,7 @@ typedef enum{
 	TK_EOF,//EOF
 	TK_RETURN,//return
 	TK_IF,//if
+	TK_WHILE,//while
 }TokenKind;
 
 extern char *user_input;
@@ -51,7 +52,8 @@ typedef enum {
 	ND_LVAR,//ローカル変数
 	ND_NUM, // 整数
 	ND_RETURN,//return
-	ND_IF//if
+	ND_IF,//if
+	ND_WHILE,//while
 } NodeKind;
 
 typedef struct Node Node;

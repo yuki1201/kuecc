@@ -127,6 +127,11 @@ Token *tokenize(char *p) {
 			p+=4;
 			continue;
 		}
+		if(headstrcmp(p,"while")&&!is_alnum(p[5])){
+			cur = new_token(TK_WHILE, cur, p, 5);
+			p+=5;
+			continue;
+		}
 		if(headstrcmp(p,"<=")||headstrcmp(p,">=")||headstrcmp(p,"==")||headstrcmp(p,"!=")){
 			cur = new_token(TK_RESERVED, cur, p,2);
 			p+=2;
@@ -185,6 +190,15 @@ Node *stmt(){
 			node->els=stmt();
 		}
 		return node;//if文に;は不要
+	}
+	if(consume("while")){
+		node=calloc(1,sizeof(Node));
+		node->kind=ND_WHILE;
+		expect("(");
+		node->cond=expr();
+		expect(")");
+		node->then=stmt();
+		return node;
 	}
 	if(consume("return")){
 		node=calloc(1,sizeof(Node));

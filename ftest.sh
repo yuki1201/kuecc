@@ -15,5 +15,6 @@ assert() {
  fi
 }
 assert 0 "-f" "code.yc"
+assert 5 "-f" "code2.yc"
 
 echo OK

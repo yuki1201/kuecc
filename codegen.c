@@ -11,6 +11,17 @@ void gen_lval(Node *node) {
 }
 void gen(Node *node) {
 	switch (node->kind) {
+		case ND_WHILE:{
+			int seq = labseq++;
+			printf(".Lbegin%d:\n", seq);
+			gen(node->cond);
+			printf("	pop rax\n");
+			printf(" 	cmp rax, 0\n");
+			printf("	je  .Lend%d\n", seq);
+			gen(node->then);
+			printf("	jmp  .Lbegin%d\n", seq);
+			printf(".Lend%d:\n", seq);
+		}
 		case ND_IF: {
 			int seq = labseq++;
 			if (node->els) {
