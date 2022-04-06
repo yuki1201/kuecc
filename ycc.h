@@ -11,6 +11,7 @@ typedef enum{
 	TK_NUM,//数字
 	TK_EOF,//EOF
 	TK_RETURN,//return
+	TK_IF,//if
 }TokenKind;
 
 extern char *user_input;
@@ -50,6 +51,7 @@ typedef enum {
 	ND_LVAR,//ローカル変数
 	ND_NUM, // 整数
 	ND_RETURN,//return
+	ND_IF//if
 } NodeKind;
 
 typedef struct Node Node;
@@ -61,6 +63,9 @@ struct Node {
 	Node *rhs; // 右辺
 	int val; // kindがND_NUMの場合のみ使う
 	int offset;
+	Node *cond;//条件
+	Node *then;//if true
+	Node *els;//if else
 };
 
 extern Node *code[100];
@@ -68,6 +73,8 @@ Token *token;//global宣言
 
 Node *expr();
 void program();
+
+extern int labseq;
 
 void codegen(Node *node);
 void gen(Node *node);

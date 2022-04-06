@@ -112,14 +112,19 @@ Token *tokenize(char *p) {
 			p++;
 			continue;
 		}
-		if(headstrcmp(p,"return")){
-			cur = new_token(TK_RETURN, cur ,p++,6);
-			p+=5;
+		if(headstrcmp(p,"return")&&!is_alnum(p[6])){
+			cur = new_token(TK_RETURN, cur ,p,6);
+			p+=6;
+			continue;
+		}
+		if(headstrcmp(p,"if")&&!is_alnum(p[2])){
+			cur = new_token(TK_IF, cur, p, 2);
+			p+=2;
 			continue;
 		}
 		if(headstrcmp(p,"<=")||headstrcmp(p,">=")||headstrcmp(p,"==")||headstrcmp(p,"!=")){
-			cur = new_token(TK_RESERVED, cur, p++,2);
-			p++;
+			cur = new_token(TK_RESERVED, cur, p,2);
+			p+=2;
 			continue;
 		}
 		if(*p == '+' || *p == '-'||*p == '*' || *p == '/'||*p == '(' || *p == ')'||*p == '>' || *p == '<'||*p == '=' || *p == ';') {
@@ -164,10 +169,22 @@ void program(){
 
 Node *stmt(){
 	Node *node;
+	if(consume("if")){
+		node=calloc(1,sizeof(Node));
+		node->kind=ND_IF;
+		expect("(");
+		node->cond=expr();
+		expect(")");
+		node->then=stmt();
+		if(consume("else")){
+			node->els=stmt();
+		}
+		return node;//if文に;は不要
+	}
 	if(consume("return")){
 		node=calloc(1,sizeof(Node));
 		node->kind=ND_RETURN;
-		node->lhs=expr();//error gen
+		node->lhs=expr();
 	}
 	else{
 		node=expr();
