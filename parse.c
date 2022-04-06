@@ -122,6 +122,11 @@ Token *tokenize(char *p) {
 			p+=2;
 			continue;
 		}
+		if(headstrcmp(p,"else")&&!is_alnum(p[4])){
+			cur = new_token(TK_RESERVED, cur, p, 4);
+			p+=4;
+			continue;
+		}
 		if(headstrcmp(p,"<=")||headstrcmp(p,">=")||headstrcmp(p,"==")||headstrcmp(p,"!=")){
 			cur = new_token(TK_RESERVED, cur, p,2);
 			p+=2;
@@ -140,7 +145,7 @@ Token *tokenize(char *p) {
 			cur = new_token(TK_IDENT, cur, p++,1);
 			continue;
 		}
-
+		printf("%s\n",p);
 		error("can not tokenize");
 	}
 	new_token(TK_EOF, cur, p, 0);

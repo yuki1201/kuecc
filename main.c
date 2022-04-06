@@ -1,7 +1,20 @@
 #include "ycc.h"
 
 int main(int argc, char **argv){
-	if (argc!=2){
+	if(strcmp(argv[1],"-f")==0){
+		 FILE *fp;
+		 char pgf[100];
+		 fp=fopen(argv[2],"r");
+		 if(fp==NULL){
+		 	return 1;
+		 }
+		 else{
+		 	int lenofpgf=fread(pgf,1,99,fp);
+		 	pgf[lenofpgf-1]='\0';
+		 	argv[1]=pgf;
+		 }
+	}
+	else if (argc!=2){
 		fprintf(stderr,"arguments number error");
 		return 1;
 	}
