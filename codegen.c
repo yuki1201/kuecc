@@ -7,26 +7,32 @@ void gen_lval(Node *node) {
 	printf("	push rax\n");
 }
 void gen(Node *node) {
- switch (node->kind) {
- case ND_NUM:
- printf("	push %d\n", node->val);
- return;
- case ND_LVAR:
- gen_lval(node);
- printf("	pop rax\n");
- printf("	mov rax, [rax]\n");
- printf("	push rax\n");
- return;
- case ND_ASSIGN:
-
- gen_lval(node->lhs);
- gen(node->rhs);
- printf("	pop rdi\n");
- printf("	pop rax\n");
- printf("	mov [rax], rdi\n");
- printf("	push rdi\n");
- return;
- }
+	switch (node->kind) {
+		case ND_RETURN:
+			gen(node->lhs);
+	 		printf("	pop rax\n");
+			printf("	mov rsp, rbp\n");
+			printf("	pop rbp\n");
+			printf("	ret\n");
+			return;
+		case ND_NUM:
+			printf("	push %d\n", node->val);
+			return;
+		case ND_LVAR:
+			gen_lval(node);
+			printf("	pop rax\n");
+			printf("	mov rax, [rax]\n");
+			printf("	push rax\n");
+			return;
+		case ND_ASSIGN:
+			gen_lval(node->lhs);
+			gen(node->rhs);
+			printf("	pop rdi\n");
+			printf("	pop rax\n");
+			printf("	mov [rax], rdi\n");
+			printf("	push rdi\n");
+			return;
+}
 
 	gen(node->lhs);
 	gen(node->rhs);

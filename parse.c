@@ -50,7 +50,7 @@ bool consume(char *op){
 	}
 }
 
-Token *consume_ident() {
+Token *consume_tk_ident() {
   if (token->kind != TK_IDENT)
     return NULL;
   Token *t = token;
@@ -69,8 +69,8 @@ void expect(char *op){
 
 int expect_number(){
 	if(token->kind!=TK_NUM){
-		error_at(token->str, "NaN");
-	}
+		error_at(token->str, "Not a Number");
+	} 
 	int val=token->val;
 	token=token->next;
 	return val;
@@ -90,8 +90,17 @@ Token *new_token(TokenKind kind, Token *cur, char *str,int len) {
 }
 
 bool headstrcmp(char *p, char *q) {
+	//printf("%s:%s\n",p,q);
   return memcmp(p, q, strlen(q)) == 0;
 }
+
+int is_alnum(char c) {
+	return ('a' <= c && c <= 'z') ||
+	('A' <= c && c <= 'Z') ||
+	('0' <= c && c <= '9') ||
+	(c == '_');
+}
+
 
 Token *tokenize(char *p) {
 	Token head;
@@ -101,6 +110,11 @@ Token *tokenize(char *p) {
 		
 		if (isspace(*p)) {// 空白文字をスキップ
 			p++;
+			continue;
+		}
+		if(headstrcmp(p,"return")){
+			cur = new_token(TK_RETURN, cur ,p++,6);
+			p+=5;
 			continue;
 		}
 		if(headstrcmp(p,"<=")||headstrcmp(p,">=")||headstrcmp(p,"==")||headstrcmp(p,"!=")){
@@ -149,9 +163,18 @@ void program(){
 }
 
 Node *stmt(){
-	Node *node = expr();
+	Node *node;
+	if(consume("return")){
+		node=calloc(1,sizeof(Node));
+		node->kind=ND_RETURN;
+		node->lhs=expr();//error gen
+	}
+	else{
+		node=expr();
+	}
 	expect(";");
 	return node;
+	
 }
 
 Node *expr() {
@@ -248,7 +271,8 @@ Node *primary() {
 		consume(")");
 		return node;
 	}
-	Token *tok = consume_ident();
+	//Token *tok = consume_ident();
+	Token *tok = consume_tk_ident();
 	if (tok) {
 		Node *node = calloc(1, sizeof(Node));
 		node->kind = ND_LVAR;
@@ -256,5 +280,6 @@ Node *primary() {
 		return node;
 	}
 	// そうでなければ数値のはず
+
 	return new_node_num(expect_number());
 }

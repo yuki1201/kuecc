@@ -26,4 +26,6 @@ assert 1 "10!=11;"
 assert 1 "5+2>5-2;"
 assert 1 "5>3;"
 assert 7 "a=2*3;b=4+2-5;c=a+b;"
+assert 10 "return 10;"
+assert 6 "a=1;b=2;c=3;return a+b+c;"
 echo OK

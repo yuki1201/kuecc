@@ -10,6 +10,7 @@ typedef enum{
 	TK_IDENT,//識別子
 	TK_NUM,//数字
 	TK_EOF,//EOF
+	TK_RETURN,//return
 }TokenKind;
 
 extern char *user_input;
@@ -27,7 +28,7 @@ void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 bool consume(char *op);
 void expect(char *op);
-int expect_number();
+//int expect_number();
 bool at_eof();
 Token *new_token(TokenKind kind, Token *cur, char *str, int len);
 Token *tokenize();
@@ -48,6 +49,7 @@ typedef enum {
 	ND_ASSIGN,//代入
 	ND_LVAR,//ローカル変数
 	ND_NUM, // 整数
+	ND_RETURN,//return
 } NodeKind;
 
 typedef struct Node Node;
