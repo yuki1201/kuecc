@@ -13,6 +13,7 @@ typedef enum{
 	TK_RETURN,//return
 	TK_IF,//if
 	TK_WHILE,//while
+	TK_FOR,//for
 }TokenKind;
 
 extern char *user_input;
@@ -54,6 +55,7 @@ typedef enum {
 	ND_RETURN,//return
 	ND_IF,//if
 	ND_WHILE,//while
+	ND_FOR,//for
 } NodeKind;
 
 typedef struct Node Node;
@@ -68,6 +70,8 @@ struct Node {
 	Node *cond;//条件
 	Node *then;//if true
 	Node *els;//if else
+	Node *init;
+	Node *cntr;
 };
 
 extern Node *code[100];

@@ -132,6 +132,11 @@ Token *tokenize(char *p) {
 			p+=5;
 			continue;
 		}
+		if(headstrcmp(p,"for")&&!is_alnum(p[3])){
+			cur = new_token(TK_FOR, cur, p, 3);
+			p+=3;
+			continue;
+		}
 		if(headstrcmp(p,"<=")||headstrcmp(p,">=")||headstrcmp(p,"==")||headstrcmp(p,"!=")){
 			cur = new_token(TK_RESERVED, cur, p,2);
 			p+=2;
@@ -196,6 +201,20 @@ Node *stmt(){
 		node->kind=ND_WHILE;
 		expect("(");
 		node->cond=expr();
+		expect(")");
+		node->then=stmt();
+		return node;
+	}
+	if(consume("for")){
+		node=calloc(1,sizeof(Node));
+		node->kind=ND_FOR;
+		expect("(");
+		node->init=expr();
+		expect(";");
+		node->cond=expr();
+		expect(";");
+		node->cntr=expr();
+		expect(";");
 		expect(")");
 		node->then=stmt();
 		return node;

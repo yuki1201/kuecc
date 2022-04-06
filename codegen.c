@@ -4,13 +4,26 @@ int labseq=0;
 
 void gen_lval(Node *node) {
 	if (node->kind != ND_LVAR)
-		error("代入の左辺値が変数ではありません");
+		error("left value is not a var");
 	printf("	mov rax, rbp\n");
 	printf("	sub rax, %d\n", node->offset);
 	printf("	push rax\n");
 }
 void gen(Node *node) {
 	switch (node->kind) {
+		case ND_FOR:{
+			int seq = labseq++;
+			gen(node->init);
+			printf(".Lbegin%d:\n", seq);
+			gen(node->cond);
+			printf("	pop rax\n");
+			printf(" 	cmp rax, 0\n");
+			printf("	je  .Lend%d\n", seq);
+			gen(node->then);
+			gen(node->cntr);
+			printf("	jmp  .Lbegin%d\n", seq);
+			printf(".Lend%d:\n", seq);
+		}
 		case ND_WHILE:{
 			int seq = labseq++;
 			printf(".Lbegin%d:\n", seq);
