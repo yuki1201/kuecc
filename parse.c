@@ -137,11 +137,25 @@ Node *stmt(){
 		node->then=stmt();
 		return node;
 	}
+	if(consume("{")){
+		Node *head;
+		head->next=NULL;
+		Node *compstmt=head;
+		while(!consume("}")){
+			compstmt->next = stmt();
+			compstmt=compstmt->next;
+		}
+		Node *node = calloc(1, sizeof(Node));
+		node->kind = ND_BLOCK;
+		node->body=head->next;
+		return node;
+	}
 	if(consume("return")){
 		node=calloc(1,sizeof(Node));
 		node->kind=ND_RETURN;
 		node->lhs=expr();
 	}
+	
 	else{
 		node=expr();
 	}
