@@ -72,6 +72,7 @@ struct Node {
 	Node *els;//if else
 	Node *init;
 	Node *cntr;
+	Node *body;
 };
 
 extern Node *code[100];
