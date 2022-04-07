@@ -140,7 +140,6 @@ Node *stmt(){
 		node->cond=expr();
 		expect(";");
 		node->cntr=expr();
-		expect(";");
 		expect(")");
 		node->then=stmt();
 		return node;
@@ -198,6 +197,10 @@ Node *assign(){
 	if(consume("=")){
 		node=new_node(ND_ASSIGN,node,assign());
 	}
+	if (consume("++")){
+		return new_node(ND_ASSIGN,node,new_node(ND_ADD, node, new_node_num(1)));
+		expect(";");
+	}
 	return node;
 }
 
@@ -240,10 +243,10 @@ Node *relational(){
 Node *add(){
 	Node *node = mul();
 	while(true) {
-		if (consume("+")){
+		if (memcmp(token->str,"++",2)!=0&&consume("+")){
 			node = new_node(ND_ADD, node, mul());
 		}
-		else if (consume("-")){
+		else if (memcmp(token->str,"--",2)!=0&&consume("-")){
 			node = new_node(ND_SUB, node, mul());
 		}
 		else{
@@ -261,6 +264,7 @@ Node *mul() {
 		else if (consume("/")){
 			node = new_node(ND_DIV, node, unary());
 		}
+
 		else{
 			return node;
 		}
@@ -268,9 +272,9 @@ Node *mul() {
 }
 
 Node *unary() {
-	if (consume("+"))
+	if (memcmp(token->str,"++",2)!=0&&consume("+"))
 		return primary();
-	if (consume("-"))
+	if (memcmp(token->str,"--",2)!=0&&consume("-"))
 		return new_node(ND_SUB, new_node_num(0), primary());
 	return primary();
 }
@@ -290,17 +294,7 @@ Node *primary() {
 		node->offset = (tok->str[0] - 'a' + 1) * 8;
 		return node;
 	}
-	//printf("hoge");
-	/*
-	if(token->val){
-		printf("%d\n",token->val);
-	}
-	else{
-		printf("%s\n", token->str);
-	}
-*/
 	
 	// そうでなければ数値のはず
-
 	return new_node_num(expect_number());
 }
