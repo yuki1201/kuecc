@@ -87,6 +87,12 @@ void gen(Node *node) {
 			printf("	mov [rax], rdi\n");
 			printf("	push rdi\n");
 			return;
+		case ND_GOTO:
+			printf("	jmp .Lgoto%d\n",node->str[0]);
+			return;
+		case ND_LABEL:
+			printf(".Lgoto%d:\n",node->str[0]);
+			return;
 }
 
 	gen(node->lhs);

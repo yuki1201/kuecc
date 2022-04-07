@@ -56,12 +56,17 @@ Token *tokenize(char *p) {
 			p+=3;
 			continue;
 		}
+		if(headstrcmp(p,"goto")&&!is_alnum(p[4])){
+			cur = new_token(TK_FOR, cur, p, 4);
+			p+=4;
+			continue;
+		}
 		if(headstrcmp(p,"<=")||headstrcmp(p,">=")||headstrcmp(p,"==")||headstrcmp(p,"!=")){
 			cur = new_token(TK_RESERVED, cur, p,2);
 			p+=2;
 			continue;
 		}
-		if(*p == '+' || *p == '-'||*p == '*' || *p == '/'||*p == '(' || *p == ')'||*p == '>' || *p == '<'||*p == '=' || *p == ';'|| *p == '{'|| *p == '}') {
+		if(*p == '+' || *p == '-'||*p == '*' || *p == '/'||*p == '(' || *p == ')'||*p == '>' || *p == '<'||*p == '=' || *p == ';'|| *p == '{'|| *p == '}'|| *p == ':') {
 			cur = new_token(TK_RESERVED, cur, p++,1);
 			continue;
 		}
@@ -74,6 +79,12 @@ Token *tokenize(char *p) {
 			cur = new_token(TK_IDENT, cur, p++,1);
 			continue;
 		}
+		
+		if ('A' <= *p && *p <= 'Z') {
+			cur = new_token(TK_LABEL, cur, p++,1);
+			continue;
+		}
+
 		printf("%s\n",p);
 		error("can not tokenize");
 	}

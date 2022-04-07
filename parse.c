@@ -58,6 +58,14 @@ Token *consume_tk_ident() {
   return t;
 }
 
+Token *consume_tk_label() {
+  if (token->kind != TK_LABEL)
+    return NULL;
+  Token *t = token;
+  token = token->next;
+  return t;
+}
+
 void expect(char *op){
 	if(memcmp(token->str,op,strlen(op))!=0){
 		error_at(token->str,"Not a Expected Sign");
@@ -150,12 +158,28 @@ Node *stmt(){
 		node->body=head->next;
 		return node;
 	}
+	
+	if(consume("goto")){
+		node=calloc(1,sizeof(Node));
+		node->kind=ND_GOTO;
+		node->str=token->str;
+		token=token->next;
+		expect(";");
+		return node;
+	}
+	Token *tok = consume_tk_label();
+	if (tok) {
+		Node *node = calloc(1, sizeof(Node));
+		node->kind = ND_LABEL;
+		node->str=tok->str;
+		consume(":");
+		return node;
+	}
 	if(consume("return")){
 		node=calloc(1,sizeof(Node));
 		node->kind=ND_RETURN;
 		node->lhs=expr();
 	}
-	
 	else{
 		node=expr();
 	}
@@ -195,17 +219,17 @@ Node *equality(){
 Node *relational(){
 	Node *node = add();
 	while(true) {
-		if (consume("<")){
-			node = new_node(ND_LT, node, add());
-		}
-		else if (consume("<=")){
+		if (consume("<=")){
 			node = new_node(ND_LE, node, add());
 		}
-		else if (consume(">")){
-			node = new_node(ND_LT, add(), node);
+		else if (consume("<")){
+			node = new_node(ND_LT, node, add());
 		}
 		else if (consume(">=")){
 			node = new_node(ND_LE, add(), node);
+		}
+		else if (consume(">")){
+			node = new_node(ND_LT, add(), node);
 		}
 		else{
 			return node;
@@ -266,6 +290,16 @@ Node *primary() {
 		node->offset = (tok->str[0] - 'a' + 1) * 8;
 		return node;
 	}
+	//printf("hoge");
+	/*
+	if(token->val){
+		printf("%d\n",token->val);
+	}
+	else{
+		printf("%s\n", token->str);
+	}
+*/
+	
 	// そうでなければ数値のはず
 
 	return new_node_num(expect_number());

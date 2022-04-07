@@ -14,6 +14,8 @@ typedef enum{
 	TK_IF,//if
 	TK_WHILE,//while
 	TK_FOR,//for
+	TK_GOTO,//goto
+	TK_LABEL,//label
 }TokenKind;
 
 extern char *user_input;
@@ -57,6 +59,8 @@ typedef enum {
 	ND_WHILE,//while
 	ND_FOR,//for
 	ND_BLOCK,//{}
+	ND_GOTO,//goto
+	ND_LABEL,//label
 } NodeKind;
 
 typedef struct Node Node;
@@ -67,6 +71,7 @@ struct Node {
 	Node *lhs; // 左辺
 	Node *rhs; // 右辺
 	int val; // kindがND_NUMの場合のみ使う
+	char *str;//label
 	int offset;
 	Node *cond;//条件
 	Node *then;//if true
