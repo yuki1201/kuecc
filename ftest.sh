@@ -14,11 +14,11 @@ assert() {
  exit 1
  fi
 }
-assert 0 "-f" "code.yc"
-assert 5 "-f" "code2.yc"
-assert 10 "-f" "code3.yc"
-assert 56 "-f" "code4.yc"
-assert 10 "-f" "code5.yc"
-assert 34 "-f" "code6.yc"
+assert 0 "-f" "testfiles/code.yc"
+assert 5 "-f" "testfiles/code2.yc"
+assert 10 "-f" "testfiles/code3.yc"
+assert 56 "-f" "testfiles/code4.yc"
+assert 10 "-f" "testfiles/code5.yc"
+assert 34 "-f" "testfiles/code6.yc"
 
 echo OK
