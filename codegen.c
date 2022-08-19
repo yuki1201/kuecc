@@ -5,56 +5,56 @@ int labseq=0;
 void gen_lval(Node *node) {
 	if (node->kind != ND_LVAR)
 		error("left value is not a var");
-	printf("	mov rax, rbp\n");
-	printf("	sub rax, %d\n", node->offset);
-	printf("	push rax\n");
+	printf("LD ACC 300H\n");
+	printf("SUB ACC, %d\n", node->offset);
+	printf("PSH ACC\n");
 }
 void gen(Node *node) {
 	switch (node->kind) {
 		case ND_FOR:{
 			int seq = labseq++;
 			gen(node->init);
-			printf(".Lbegin%d:\n", seq);
+			printf("LLbegin%d:\n", seq);
 			gen(node->cond);
-			printf("	pop rax\n");
-			printf(" 	cmp rax, 0\n");
-			printf("	je  .Lend%d\n", seq);
+			printf("POP ACC\n");
+			printf("CMP ACC, 0\n");
+			printf("BZ  LLend%d\n", seq);
 			gen(node->then);
 			gen(node->cntr);
-			printf("	jmp  .Lbegin%d\n", seq);
-			printf(".Lend%d:\n", seq);
+			printf("BA  LLbegin%d\n", seq);
+			printf("LLend%d:\n", seq);
 		}
 		case ND_WHILE:{
 			int seq = labseq++;
-			printf(".Lbegin%d:\n", seq);
+			printf("LLbegin%d:\n", seq);
 			gen(node->cond);
-			printf("	pop rax\n");
-			printf(" 	cmp rax, 0\n");
-			printf("	je  .Lend%d\n", seq);
+			printf("POP ACC\n");
+			printf("CMP ACC, 0\n");
+			printf("BZ  LLend%d\n", seq);
 			gen(node->then);
-			printf("	jmp  .Lbegin%d\n", seq);
-			printf(".Lend%d:\n", seq);
+			printf("BA  LLbegin%d\n", seq);
+			printf("LLend%d:\n", seq);
 		}
 		case ND_IF: {
 			int seq = labseq++;
 			if (node->els) {
 				gen(node->cond);
-				printf("	pop rax\n");
-				printf(" 	cmp rax, 0\n");
-				printf(" 	je  .Lelse%d\n", seq);
+				printf("POP ACC\n");
+				printf("CMP ACC, 0\n");
+				printf("BZ  LLelse%d\n", seq);
 				gen(node->then);
-				printf(" 	jmp .Lend%d\n", seq);
-				printf(".Lelse%d:\n", seq);
+				printf("BA LLend%d\n", seq);
+				printf("LLelse%d:\n", seq);
 				gen(node->els);
-				printf(".Lend%d:\n", seq);
+				printf("LLend%d:\n", seq);
 			} 
 			else {
 				gen(node->cond);
-				printf("	pop rax\n");
-				printf(" 	cmp rax, 0\n");
-				printf("	je  .Lend%d\n", seq);
+				printf("POP ACC\n");
+				printf("CMP ACC, 0\n");
+				printf("BZ  LLend%d\n", seq);
 				gen(node->then);
-				printf(".Lend%d:\n", seq);
+				printf("LLend%d:\n", seq);
 			}
 			return;
 		}
@@ -65,74 +65,82 @@ void gen(Node *node) {
 			return;
 		case ND_RETURN:
 			gen(node->lhs);
-	 		printf("	pop rax\n");
-			printf("	mov rsp, rbp\n");
-			printf("	pop rbp\n");
-			printf("	ret\n");
+	 		printf("POP ACC\n");
+			printf("LD SP, 300H\n");
+			printf("POP ACC\n");
+			printf("OUT\n");
+			printf("RET\n");
 			return;
 		case ND_NUM:
-			printf("	push %d\n", node->val);
+			printf("LD ACC %d\n", node->val);
+			printf("PSH ACC\n");
 			return;
 		case ND_LVAR:
 			gen_lval(node);
-			printf("	pop rax\n");
-			printf("	mov rax, [rax]\n");
-			printf("	push rax\n");
+			printf("POP IX\n");
+			printf("LD ACC, [IX]\n");
+			printf("PSH ACC\n");
 			return;
 		case ND_ASSIGN:
 			gen_lval(node->lhs);
 			gen(node->rhs);
-			printf("	pop rdi\n");
-			printf("	pop rax\n");
-			printf("	mov [rax], rdi\n");
-			printf("	push rdi\n");
+			printf("POP ACC\n");
+			printf("POP IX\n");
+			printf("ST ACC [IX]\n");
+			printf("PSH ACC\n");
 			return;
 		case ND_GOTO:
-			printf("	jmp .Lgoto%d\n",node->str[0]);
+			printf("BA LLgoto%d\n",node->str[0]);
 			return;
 		case ND_LABEL:
-			printf(".Lgoto%d:\n",node->str[0]);
+			printf("LLgoto%d:\n",node->str[0]);
 			return;
 }
 
 	gen(node->lhs);
 	gen(node->rhs);
-	printf("	pop rdi\n");
-	printf("	pop rax\n");
+	printf("POP IX\n");
+	printf("POP ACC\n");
+	int seq = labseq++;
 	switch (node->kind) {
 		case ND_ADD:
-			printf("	add rax, rdi\n");
+			printf("ADD ACC, IX\n");
 			break;
 		case ND_SUB:
-			printf("	sub rax, rdi\n");
+			printf("SUB ACC, IX\n");
 			break;
 		case ND_MUL:
-			printf("	imul rax, rdi\n");
+			printf("imul ACC, IX\n");
 			break;
 		case ND_DIV:
-			printf("	cqo\n");
-			printf("	idiv rdi\n");
+			printf("cqo\n");
+			printf("idiv IX\n");
 			break;
 		case ND_EQ:
-			printf("	cmp rax, rdi\n");
-			printf("	sete al\n");
-			printf("	movzb rax, al\n");
+			
+			printf("CMP ACC, IX\n");
+			printf("BZ ND_EQ_JP1%d\n",seq);
+			printf("LD ACC 0\n");
+			printf("BA ND_EQ_JP2%d\n",seq);
+			printf("ND_EQ_JP1%d:\n",seq);
+			printf("LD ACC 1\n");
+			printf("ND_EQ_JP2%d:\n",seq);
 			break;
 		case ND_NE:
-			printf("	cmp rax, rdi\n");
-			printf("	setne al\n");
-			printf("	movzb rax, al\n");
+			printf("CMP ACC, IX\n");
+			printf("setne al\n");
+			printf("LDzb ACC, al\n");
 			break;
 		case ND_LT:
-			printf("	cmp rax, rdi\n");
-			printf("	setl al\n");
-			printf("	movzb rax, al\n");
+			printf("CMP ACC, IX\n");
+			printf("setl al\n");
+			printf("LDzb ACC, al\n");
 			break;
 		case ND_LE:
-			printf("	cmp rax, rdi\n");
-			printf("	setle al\n");
-			printf("	movzb rax, al\n");
+			printf("CMP ACC, IX\n");
+			printf("setle al\n");
+			printf("LDzb ACC, al\n");
 			break;
 	}
-	printf("	push rax\n");
+	printf("PSH ACC\n");
 }
