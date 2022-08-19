@@ -5,7 +5,7 @@ int labseq=0;
 void gen_lval(Node *node) {
 	if (node->kind != ND_LVAR)
 		error("left value is not a var");
-	printf("LD ACC 300H\n");
+	printf("LD ACC 1300H\n");
 	printf("SUB ACC, %d\n", node->offset);
 	printf("PSH ACC\n");
 }
@@ -66,7 +66,7 @@ void gen(Node *node) {
 		case ND_RETURN:
 			gen(node->lhs);
 	 		printf("POP ACC\n");
-			printf("LD SP, 300H\n");
+			printf("LD SP, 1300H\n");
 			printf("POP ACC\n");
 			printf("OUT\n");
 			printf("RET\n");
@@ -128,18 +128,31 @@ void gen(Node *node) {
 			break;
 		case ND_NE:
 			printf("CMP ACC, IX\n");
-			printf("setne al\n");
-			printf("LDzb ACC, al\n");
+			printf("BNZ ND_EQ_JP1%d\n",seq);
+			printf("LD ACC 0\n");
+			printf("BA ND_EQ_JP2%d\n",seq);
+			printf("ND_EQ_JP1%d:\n",seq);
+			printf("LD ACC 1\n");
+			printf("ND_EQ_JP2%d:\n",seq);
 			break;
 		case ND_LT:
 			printf("CMP ACC, IX\n");
-			printf("setl al\n");
-			printf("LDzb ACC, al\n");
+			printf("BN ND_EQ_JP1%d\n",seq);
+			printf("LD ACC 0\n");
+			printf("BA ND_EQ_JP2%d\n",seq);
+			printf("ND_EQ_JP1%d:\n",seq);
+			printf("LD ACC 1\n");
+			printf("ND_EQ_JP2%d:\n",seq);
 			break;
 		case ND_LE:
 			printf("CMP ACC, IX\n");
-			printf("setle al\n");
-			printf("LDzb ACC, al\n");
+			printf("BZN ND_EQ_JP1%d\n",seq);
+			printf("LD ACC 0\n");
+			printf("BA ND_EQ_JP2%d\n",seq);
+			printf("ND_EQ_JP1%d:\n",seq);
+			printf("LD ACC 1\n");
+			printf("ND_EQ_JP2%d:\n",seq);
+			break;
 			break;
 	}
 	printf("PSH ACC\n");
