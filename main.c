@@ -24,6 +24,7 @@ int main(int argc, char **argv){
 	printf("LD SP 1500H\n");
 	for (int i = 0; code[i]; i++) {
 		gen(code[i]);
-	printf("	HLT\n");
+	}
+	printf("HLT\n");
 	return 0;
 }
