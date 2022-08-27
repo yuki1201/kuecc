@@ -23,6 +23,7 @@ void gen(Node *node) {
 			gen(node->cntr);
 			printf("BA  LLbegin%d\n", seq);
 			printf("LLend%d:\n", seq);
+			printf("NOP\n");
 		}
 		case ND_WHILE:{
 			int seq = labseq++;
@@ -34,6 +35,7 @@ void gen(Node *node) {
 			gen(node->then);
 			printf("BA  LLbegin%d\n", seq);
 			printf("LLend%d:\n", seq);
+			printf("NOP\n");
 		}
 		case ND_IF: {
 			int seq = labseq++;
@@ -47,6 +49,7 @@ void gen(Node *node) {
 				printf("LLelse%d:\n", seq);
 				gen(node->els);
 				printf("LLend%d:\n", seq);
+				printf("NOP\n");
 			} 
 			else {
 				gen(node->cond);
@@ -55,6 +58,7 @@ void gen(Node *node) {
 				printf("BZ  LLend%d\n", seq);
 				gen(node->then);
 				printf("LLend%d:\n", seq);
+				printf("NOP\n");
 			}
 			return;
 		}
@@ -66,10 +70,10 @@ void gen(Node *node) {
 		case ND_RETURN:
 			gen(node->lhs);
 	 		printf("POP ACC\n");
-			printf("LD SP, 1300H\n");
-			printf("POP ACC\n");
-			printf("OUT\n");
-			printf("RET\n");
+	 		printf("OUT\n");
+			//printf("LD SP, 1300H\n");
+			//printf("POP ACC\n");
+			//printf("RET\n");
 			return;
 		case ND_NUM:
 			printf("LD ACC %d\n", node->val);

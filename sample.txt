@@ -1,3 +1,11 @@
-b=2;
-a=12;
-c=a-b;
+a=1;
+b=1;
+c=10;
+c=c-2;
+for(i=0;i<c;i=i+1){
+	b=a+b;
+	d=a;
+	a=b;
+	b=d;
+}
+return a;
