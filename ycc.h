@@ -83,7 +83,6 @@ struct Node {
 };
 
 extern Node *code[100];
-Token *token;//global宣言
 
 Node *expr();
 void program();
